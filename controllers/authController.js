@@ -13,7 +13,7 @@ exports.registerUser = async (req, res, next) => {
     name = name?.trim();
     role = role?.toLowerCase();
 
-    if (!name || !email || !password || !role || !phone) {
+    if (!name  || !password || !role || !phone) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -21,13 +21,13 @@ exports.registerUser = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid user role" });
     }
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ phone });
     if (existingUser) {
-      return res.status(409).json({ message: "Email already exists" });
+      return res.status(409).json({ message: "Phone number already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    // const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     const user = await User.create({
       name,
@@ -35,22 +35,22 @@ exports.registerUser = async (req, res, next) => {
       phone,
       password: hashedPassword,
       role,
-      isVerified: false,
+      isVerified: true,
     });
 
-    await Otp.create({
-      userId: user._id,
-      otp: otpCode,
-      expiresAt: Date.now() + 10 * 60 * 1000,
-    });
+    // await Otp.create({
+    //   userId: user._id,
+    //   otp: otpCode,
+    //   expiresAt: Date.now() + 10 * 60 * 1000,
+    // });
+    //
+    // await sendEmail(
+    //   email,
+    //   "Verify Your Email",
+    //   `<h3>Hello, ${name}!</h3><p>Your OTP is <strong>${otpCode}</strong>. It expires in 10 minutes.</p>`
+    // );
 
-    await sendEmail(
-      email,
-      "Verify Your Email",
-      `<h3>Hello, ${name}!</h3><p>Your OTP is <strong>${otpCode}</strong>. It expires in 10 minutes.</p>`
-    );
-
-    res.status(201).json({ message: "Registered. Check your email for OTP." });
+    res.status(201).json({ message: "Registered successfully." });
   } catch (err) {
     next(err);
   }
