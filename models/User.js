@@ -16,7 +16,7 @@ const rechargeHistorySchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   phone: { type: String }, // added for registration
-  email: { type: String, unique: true, sparse: true },
+  email: { type: String, sparse: true },
   password: { type: String },
   role: {
     type: String,
